@@ -28,16 +28,21 @@ async function ensureDefaultAdminIfNoUsers() {
 }
 
 function dbConfigErrorResponse(error: unknown): NextResponse | null {
-  const msg = String((error as any)?.message ?? error ?? "");
-  if (/relation .* does not exist/i.test(msg)) {
+  const e = error as any;
+  // drizzle wraps driver errors; real details can live in cause/data
+  const info = [e?.message, e?.cause?.message, e?.data?.error, e?.cause?.data?.error]
+    .filter(Boolean)
+    .map(String)
+    .join(" ");
+  if (/relation .* does not exist/i.test(info)) {
     return NextResponse.json(
-      { error: "Database tables तयार नाहीत. DATABASE_URL सेट करून प्रथम 'npm run db:push' चालवा, मग पुन्हा login करा." },
+      { error: "Database tables तयार नाहीत. browser मध्ये '/api/seed' एकदा उघडा — tables आणि admin आपोआप तयार होतील. मग पुन्हा login करा." },
       { status: 500 }
     );
   }
-  if (/ENOTFOUND|ECONNREFUSED|ETIMEDOUT|EHOSTUNREACH|timeout|certificate|self signed|password authentication failed/i.test(msg)) {
+  if (/ENOTFOUND|ECONNREFUSED|ETIMEDOUT|EHOSTUNREACH|timeout|certificate|self signed|password authentication failed/i.test(info)) {
     return NextResponse.json(
-      { error: "Database ला connect होत नाही. DATABASE_URL तपासा आणि database चालू आहे का याची खात्री करा.", detail: msg },
+      { error: "Database ला connect होत नाही. DATABASE_URL तपासा आणि database चालू आहे का याची खात्री करा.", detail: info },
       { status: 500 }
     );
   }
