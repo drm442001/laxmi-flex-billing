@@ -1,23 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, sessions } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
-import { verifyPassword, generateToken, logActivity } from "@/lib/auth";
+import { eq, and, count } from "drizzle-orm";
+import { verifyPassword, hashPassword, generateToken, logActivity } from "@/lib/auth";
+
+// First-run bootstrap: on a completely fresh database (zero user accounts),
+// automatically create the default admin so the first login works out of the box.
+async function ensureDefaultAdminIfNoUsers() {
+  const [row] = await db.select({ value: count() }).from(users);
+  if (Number(row?.value ?? 0) > 0) return;
+
+  const hashed = await hashPassword("admin123");
+  await db
+    .insert(users)
+    .values({
+      username: "admin",
+      password: hashed,
+      name: "Administrator",
+      role: "admin",
+      isActive: true,
+    })
+    .onConflictDoNothing();
+
+  console.warn(
+    "[auth] No user accounts found — created default admin (username: admin, password: admin123). Please change the password after logging in."
+  );
+}
+
+function dbConfigErrorResponse(error: unknown): NextResponse | null {
+  const msg = String((error as any)?.message ?? error ?? "");
+  if (/relation .* does not exist/i.test(msg)) {
+    return NextResponse.json(
+      { error: "Database tables तयार नाहीत. DATABASE_URL सेट करून प्रथम 'npm run db:push' चालवा, मग पुन्हा login करा." },
+      { status: 500 }
+    );
+  }
+  if (/ENOTFOUND|ECONNREFUSED|ETIMEDOUT|EHOSTUNREACH|timeout|certificate|self signed|password authentication failed/i.test(msg)) {
+    return NextResponse.json(
+      { error: "Database ला connect होत नाही. DATABASE_URL तपासा आणि database चालू आहे का याची खात्री करा.", detail: msg },
+      { status: 500 }
+    );
+  }
+  return null;
+}
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { username, password, remember } = body;
+    const username = typeof body?.username === "string" ? body.username.trim() : "";
+    const password = typeof body?.password === "string" ? body.password : "";
+    const remember = Boolean(body?.remember);
 
     if (!username || !password) {
       return NextResponse.json({ error: "Username and password are required" }, { status: 400 });
     }
 
-    // Find user
-    const [user] = await db
+    // Find user; on a fresh database, bootstrap the default admin first
+    let [user] = await db
       .select()
       .from(users)
       .where(and(eq(users.username, username), eq(users.isActive, true)));
+
+    if (!user) {
+      await ensureDefaultAdminIfNoUsers();
+      [user] = await db
+        .select()
+        .from(users)
+        .where(and(eq(users.username, username), eq(users.isActive, true)));
+    }
 
     if (!user) {
       return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
@@ -72,6 +122,8 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     console.error("Login error:", error);
+    const dbError = dbConfigErrorResponse(error);
+    if (dbError) return dbError;
     return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
 }

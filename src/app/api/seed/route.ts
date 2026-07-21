@@ -45,7 +45,14 @@ export async function GET() {
         message: "Please try logging in now." 
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const msg = String(error?.message ?? error);
+    let hint = "DATABASE_URL बरोबर आहे का आणि database चालू आहे का ते तपासा.";
+    if (/relation .* does not exist/i.test(msg)) {
+      hint = "Database tables तयार नाहीत. प्रथम 'npm run db:push' चालवा आणि मग पुन्हा /api/seed उघडा.";
+    } else if (!process.env.DATABASE_URL) {
+      hint = "DATABASE_URL सेट केलेला नाही. .env फाईल किंवा hosting (Vercel) environment variables तपासा.";
+    }
+    return NextResponse.json({ error: msg, hint }, { status: 500 });
   }
 }
 export async function POST() { return GET(); }
