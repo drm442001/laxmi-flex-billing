@@ -2,34 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, sessions } from "@/db/schema";
 import { eq, and, count } from "drizzle-orm";
-import { verifyPassword, hashPassword, generateToken, logActivity } from "@/lib/auth";
-
-// First-run bootstrap: on a completely fresh database (zero user accounts),
-// automatically create the default admin so the first login works out of the box.
-async function ensureDefaultAdminIfNoUsers() {
-  const [row] = await db.select({ value: count() }).from(users);
-  if (Number(row?.value ?? 0) > 0) return;
-
-  const hashed = await hashPassword("admin123");
-  await db
-    .insert(users)
-    .values({
-      username: "admin",
-      password: hashed,
-      name: "Administrator",
-      role: "admin",
-      isActive: true,
-    })
-    .onConflictDoNothing();
-
-  console.warn(
-    "[auth] No user accounts found — created default admin (username: admin, password: admin123). Please change the password after logging in."
-  );
-}
+import {
+  verifyPassword, generateToken, logActivity, getClientIp,
+  SESSION_DEFAULT_DAYS, SESSION_REMEMBER_DAYS, sessionCookieOptions,
+} from "@/lib/auth";
 
 function dbConfigErrorResponse(error: unknown): NextResponse | null {
   const e = error as any;
-  // drizzle wraps driver errors; real details can live in cause/data
   const info = [e?.message, e?.cause?.message, e?.data?.error, e?.cause?.data?.error]
     .filter(Boolean)
     .map(String)
@@ -42,68 +21,65 @@ function dbConfigErrorResponse(error: unknown): NextResponse | null {
   }
   if (/ENOTFOUND|ECONNREFUSED|ETIMEDOUT|EHOSTUNREACH|timeout|certificate|self signed|password authentication failed/i.test(info)) {
     return NextResponse.json(
-      { error: "Database ला connect होत नाही. DATABASE_URL तपासा आणि database चालू आहे का याची खात्री करा.", detail: info },
+      { error: "Database ला connect होत नाही. DATABASE_URL तपासा आणि database चालू आहे का याची खात्री करा." },
       { status: 500 }
     );
   }
   return null;
 }
 
+// Dummy bcrypt hash to do a constant-time compare on missing users (anti enumeration)
+const DUMMY_HASH = "$2a$12$CwTycUXWue0Thq9StjUM0uJ8.mVfE0xZ3jK5lR8Qe3g7rJ7xK6Z1W";
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const username = typeof body?.username === "string" ? body.username.trim() : "";
+    const body = await req.json().catch(() => null);
+    const username = typeof body?.username === "string" ? body.username.trim().toLowerCase() : "";
     const password = typeof body?.password === "string" ? body.password : "";
     const remember = Boolean(body?.remember);
 
     if (!username || !password) {
       return NextResponse.json({ error: "Username and password are required" }, { status: 400 });
     }
+    if (username.length > 64 || password.length > 256) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 400 });
+    }
 
-    // Find user; on a fresh database, bootstrap the default admin first
-    let [user] = await db
+    const [user] = await db
       .select()
       .from(users)
       .where(and(eq(users.username, username), eq(users.isActive, true)));
 
-    if (!user) {
-      await ensureDefaultAdminIfNoUsers();
-      [user] = await db
-        .select()
-        .from(users)
-        .where(and(eq(users.username, username), eq(users.isActive, true)));
+    let valid = false;
+    if (user) {
+      valid = await verifyPassword(password, user.password);
+    } else {
+      await verifyPassword(password, DUMMY_HASH).catch(() => false);
     }
 
-    if (!user) {
+    if (!user || !valid) {
+      await logActivity(null, "login_failed", "auth", undefined, `Failed login for ${username}`);
       return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
 
-    // Verify password
-    const valid = await verifyPassword(password, user.password);
-    if (!valid) {
-      return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
-    }
-
-    // Create session
     const token = generateToken();
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + (remember ? 30 : 1)); // 30 days or 1 day
+    const days = remember ? SESSION_REMEMBER_DAYS : SESSION_DEFAULT_DAYS;
+    expiresAt.setDate(expiresAt.getDate() + days);
+    const ip = getClientIp(req);
 
     await db.insert(sessions).values({
       userId: user.id,
       token,
       expiresAt,
-      ipAddress: req.headers.get("x-forwarded-for") || "unknown",
-      userAgent: req.headers.get("user-agent") || "unknown",
+      ipAddress: ip || "unknown",
+      userAgent: (req.headers.get("user-agent") || "unknown").slice(0, 500),
     });
 
-    // Update last login
     await db.update(users).set({ lastLogin: new Date() }).where(eq(users.id, user.id));
 
-    // Log activity
     await logActivity(user.id, "login", "auth");
 
-    // Set cookie
     const response = NextResponse.json({
       user: {
         id: user.id,
@@ -113,17 +89,9 @@ export async function POST(req: NextRequest) {
         email: user.email,
         phone: user.phone,
       },
-      token,
     });
 
-    response.cookies.set("lfp_session", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: remember ? 30 * 24 * 60 * 60 : 24 * 60 * 60,
-      path: "/",
-    });
-
+    response.cookies.set("lfp_session", token, sessionCookieOptions(days * 24 * 60 * 60));
     return response;
   } catch (error) {
     console.error("Login error:", error);

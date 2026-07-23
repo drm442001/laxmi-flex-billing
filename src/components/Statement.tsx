@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { formatCurrency, formatDate } from "@/lib/constants";
+import { E } from "@/components/emojis";
 
 interface StatementEntry {
   date: string;
@@ -62,7 +63,7 @@ export default function Statement({ customerId, onBack }: StatementProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-4xl animate-pulse">📊</div>
+        <div className="text-4xl animate-pulse"><E.Chart/></div>
       </div>
     );
   }
@@ -89,7 +90,7 @@ export default function Statement({ customerId, onBack }: StatementProps) {
           onClick={handlePrint}
           className="px-4 py-2 bg-brand-600 text-white rounded-xl font-semibold text-sm hover:bg-brand-700"
         >
-          🖨️ Print Statement
+          <E.Printer/> Print Statement
         </button>
       </div>
 
@@ -115,9 +116,9 @@ export default function Statement({ customerId, onBack }: StatementProps) {
             <div>
               <p className="text-xs text-gray-400 uppercase">Customer</p>
               <p className="font-bold text-lg text-gray-800">{data.customer.name}</p>
-              {data.customer.phone && <p className="text-sm text-gray-500">📱 {data.customer.phone}</p>}
-              {data.customer.email && <p className="text-sm text-gray-500">✉️ {data.customer.email}</p>}
-              {data.customer.address && <p className="text-sm text-gray-500">📍 {data.customer.address}</p>}
+              {data.customer.phone && <p className="text-sm text-gray-500"><E.Mobile/> {data.customer.phone}</p>}
+              {data.customer.email && <p className="text-sm text-gray-500"><E.Mail/> {data.customer.email}</p>}
+              {data.customer.address && <p className="text-sm text-gray-500"><E.Pin/> {data.customer.address}</p>}
             </div>
             <div className="sm:text-right">
               <p className="text-xs text-gray-400 uppercase">Current Balance</p>
@@ -173,8 +174,8 @@ export default function Statement({ customerId, onBack }: StatementProps) {
                     <td className="px-4 py-3 text-gray-600">{formatDate(entry.date)}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className={entry.type === "invoice" ? "text-blue-500" : "text-green-500"}>
-                          {entry.type === "invoice" ? "📄" : "💰"}
+                        <span className={`inline-flex items-center ${entry.type === "invoice" ? "text-blue-500" : "text-green-500"}`}>
+                          {entry.type === "invoice" ? <E.Doc/> : <E.Money/>}
                         </span>
                         {entry.description}
                       </div>

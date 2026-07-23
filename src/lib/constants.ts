@@ -1,3 +1,4 @@
+import { E } from "@/components/emojis";
 // ============================================
 // RE-EXPORT TYPES
 // ============================================
@@ -8,15 +9,15 @@ export * from "./types";
 // ============================================
 
 export const CATEGORIES = [
-  { value: "print" as const, label: "Print", icon: "🖨️" },
-  { value: "frame" as const, label: "Frame", icon: "🔲" },
-  { value: "other" as const, label: "Other", icon: "📦" },
+  { value: "print" as const, label: "Print" },
+  { value: "frame" as const, label: "Frame" },
+  { value: "other" as const, label: "Other" },
 ];
 
 export const DOCUMENT_TYPES = [
-  { value: "invoice" as const, label: "Invoice", icon: "📄" },
-  { value: "quotation" as const, label: "Quotation", icon: "📋" },
-  { value: "calculation" as const, label: "Calculation", icon: "🧮" },
+  { value: "invoice" as const, label: "Invoice" },
+  { value: "quotation" as const, label: "Quotation" },
+  { value: "calculation" as const, label: "Calculation" },
 ];
 
 export const INVOICE_TYPES = [
@@ -25,11 +26,11 @@ export const INVOICE_TYPES = [
 ];
 
 export const PAYMENT_METHODS = [
-  { value: "cash" as const, label: "Cash", icon: "💵" },
-  { value: "upi" as const, label: "UPI", icon: "📱" },
-  { value: "bank" as const, label: "Bank Transfer", icon: "🏦" },
-  { value: "cheque" as const, label: "Cheque", icon: "📝" },
-  { value: "other" as const, label: "Other", icon: "💳" },
+  { value: "cash" as const, label: "Cash" },
+  { value: "upi" as const, label: "UPI" },
+  { value: "bank" as const, label: "Bank Transfer" },
+  { value: "cheque" as const, label: "Cheque" },
+  { value: "other" as const, label: "Other" },
 ];
 
 export const PAYMENT_STATUSES = [
@@ -152,6 +153,8 @@ export function getFinancialYear(date: Date = new Date()): string {
   return `${year - 1}-${year.toString().slice(-2)}`;
 }
 
+// Client-side placeholder only. The authoritative invoice number is generated
+// server-side (race-safe via SELECT ... FOR UPDATE on company_settings.counter).
 export function generateInvoiceNumber(
   type: string = "invoice",
   prefix?: string,
@@ -160,7 +163,8 @@ export function generateInvoiceNumber(
   const now = new Date();
   const fy = getFinancialYear(now);
   const pre = prefix || (type === "invoice" ? "INV" : type === "quotation" ? "QUO" : "CAL");
-  const num = counter || Math.floor(Math.random() * 1000);
+  // Use a clearly-temporary placeholder to avoid misleading the user.
+  const num = counter ?? Math.floor(Math.random() * 9000) + 1000;
   return `${pre}/${fy}/${num.toString().padStart(4, "0")}`;
 }
 

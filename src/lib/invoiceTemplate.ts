@@ -1,4 +1,5 @@
 import { LineItem, formatNumber, numberToWords, formatDate } from "./constants";
+import { E } from "@/components/emojis";
 
 // ============================================
 // INVOICE TEMPLATE ENGINE
@@ -154,8 +155,8 @@ export function generateNormalInvoiceHTML(data: InvoiceTemplateData): string {
         <div class="company-tagline">Flex Banner Printing & Framing</div>
         <div class="company-contact">
           ${data.company.address ? `${data.company.address}, ` : ""}${data.company.city}, ${data.company.state} ${data.company.pincode}<br>
-          ${data.company.mobile ? `📱 ${data.company.mobile}` : ""} ${data.company.phone ? `☎ ${data.company.phone}` : ""}<br>
-          ${data.company.email ? `✉ ${data.company.email}` : ""}
+          ${data.company.mobile ? `Mob: ${data.company.mobile}` : ""} ${data.company.phone ? `| Ph: ${data.company.phone}` : ""}<br>
+          ${data.company.email ? `Email: ${data.company.email}` : ""}
         </div>
       </div>
       <div class="logo-section">
@@ -181,7 +182,7 @@ export function generateNormalInvoiceHTML(data: InvoiceTemplateData): string {
         <div class="info-box-content">
           <strong>${data.customer.name || "Cash Customer"}</strong>
           ${data.customer.address ? `<small>${data.customer.address}</small>` : ""}
-          ${data.customer.phone ? `<small>📱 ${data.customer.phone}</small>` : ""}
+          ${data.customer.phone ? `<small><E.Mobile/> ${data.customer.phone}</small>` : ""}
         </div>
       </div>
     </div>
@@ -218,7 +219,7 @@ export function generateNormalInvoiceHTML(data: InvoiceTemplateData): string {
         </div>
         ${data.discountAmount > 0 ? `
         <div class="total-row" style="color:#dc2626;">
-          <span>Discount (${data.discountPercent}%):</span>
+          <span>Discount (₹):</span>
           <span>- ₹${formatNumber(data.discountAmount)}</span>
         </div>` : ""}
         ${data.roundOff !== 0 ? `
@@ -245,7 +246,7 @@ export function generateNormalInvoiceHTML(data: InvoiceTemplateData): string {
     <!-- Bank & QR Section -->
     <div class="bank-qr-section">
       <div class="bank-details">
-        <div class="bank-details-title">🏦 Bank Details</div>
+        <div class="bank-details-title"><E.Bank/> Bank Details</div>
         <strong>${data.company.bankName || "Bank Name"}</strong><br>
         Branch: ${data.company.bankBranch || "-"}<br>
         A/C No: ${data.company.accountNumber || "-"}<br>
@@ -353,7 +354,7 @@ export function generateTaxInvoiceHTML(data: InvoiceTemplateData): string {
       <div class="company-name">${data.company.name}</div>
       <div class="company-address">
         ${data.company.address ? `${data.company.address}, ` : ""}${data.company.city}, ${data.company.state} ${data.company.pincode}<br>
-        📱 ${data.company.mobile || data.company.phone} | ✉ ${data.company.email || "-"}
+        <E.Mobile/> ${data.company.mobile || data.company.phone} | <E.Mail/> ${data.company.email || "-"}
       </div>
       <div class="company-gst">GSTIN: ${data.company.gstNumber || "Not Registered"} | PAN: ${data.company.panNumber || "-"}</div>
     </div>
@@ -374,7 +375,7 @@ export function generateTaxInvoiceHTML(data: InvoiceTemplateData): string {
         <div class="info-box-title">Bill To</div>
         <strong style="font-size:10px;">${data.customer.name || "Cash Customer"}</strong><br>
         ${data.customer.address || "-"}<br>
-        📱 ${data.customer.phone || "-"}<br>
+        <E.Mobile/> ${data.customer.phone || "-"}<br>
         ${data.customer.gstNumber ? `<span style="color:#dc2626;">GSTIN: ${data.customer.gstNumber}</span>` : ""}
       </div>
     </div>
@@ -427,7 +428,7 @@ export function generateTaxInvoiceHTML(data: InvoiceTemplateData): string {
     <!-- Bank & Signature -->
     <div class="bank-signature">
       <div class="bank-details">
-        <div class="bank-title">🏦 Bank Details for NEFT/RTGS</div>
+        <div class="bank-title"><E.Bank/> Bank Details for NEFT/RTGS</div>
         <strong>${data.company.bankName || "-"}</strong>, ${data.company.bankBranch || "-"}<br>
         A/C: ${data.company.accountNumber || "-"} | IFSC: ${data.company.ifscCode || "-"}<br>
         ${data.company.upiId ? `UPI: ${data.company.upiId}` : ""}

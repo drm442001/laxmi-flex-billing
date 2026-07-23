@@ -1,168 +1,133 @@
 "use client";
 
 import { LineItem } from "@/lib/constants";
+import { formatCurrency } from "@/lib/constants";
+import { E } from "@/components/emojis";
 
 interface ItemsListProps {
   items: LineItem[];
   onEdit: (item: LineItem) => void;
   onDelete: (id: string) => void;
   onDuplicate: (item: LineItem) => void;
+  onAddItem?: () => void;
 }
 
-export default function ItemsList({ items, onEdit, onDelete, onDuplicate }: ItemsListProps) {
+export default function ItemsList({ items, onEdit, onDelete, onDuplicate, onAddItem }: ItemsListProps) {
+  // Totals
+  const totalQty = items.reduce((s, i) => s + (i.quantity || 0), 0);
+  const totalAmount = items.reduce((s, i) => s + (i.amount || 0), 0);
+  const totalFit = items.reduce((s, i) => s + (i.totalFit || 0), 0);
+
   if (items.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-        <div className="text-4xl mb-3">📋</div>
-        <p className="text-gray-400 text-sm">No items added yet. Use the form above to add items.</p>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-8 text-center">
+          <div className="text-4xl mb-3"><E.Clipboard/></div>
+          <p className="text-gray-400 text-sm">No items added yet. Use the form above to add items.</p>
+        </div>
       </div>
     );
   }
 
-  const formatNum = (n: number | undefined) => {
-    if (!n || n === 0) return "-";
-    return n.toFixed(2);
-  };
-
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="font-bold text-gray-800">
-          📋 Items ({items.length})
-        </h3>
-      </div>
-
-      {/* Desktop Table */}
-      <div className="hidden lg:block overflow-x-auto">
-        <table className="w-full text-sm">
+      {/* Table styled like classic flex-billing register */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse">
           <thead>
-            <tr className="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
-              <th className="px-3 py-3 text-left w-12">#</th>
-              <th className="px-3 py-3 text-left">Description</th>
-              <th className="px-3 py-3 text-right w-16">W</th>
-              <th className="px-3 py-3 text-right w-16">WS</th>
-              <th className="px-3 py-3 text-right w-16">H</th>
-              <th className="px-3 py-3 text-right w-16">HS</th>
-              <th className="px-3 py-3 text-right w-16">Qty</th>
-              <th className="px-3 py-3 text-right w-20">Total Fit</th>
-              <th className="px-3 py-3 text-right w-20">Rate</th>
-              <th className="px-3 py-3 text-right w-24">Amount</th>
-              <th className="px-3 py-3 text-center w-28">Actions</th>
+            <tr className="bg-blue-700 text-white">
+              <th className="border border-blue-800 px-2 py-2 text-center w-12">Sr.<br/>No.</th>
+              <th className="border border-blue-800 px-2 py-2 text-left">Description</th>
+              <th className="border border-blue-800 px-2 py-2 text-center w-20">Height</th>
+              <th className="border border-blue-800 bg-blue-600 px-2 py-2 text-center w-12">H</th>
+              <th className="border border-blue-800 px-2 py-2 text-center w-20">Width</th>
+              <th className="border border-blue-800 bg-blue-600 px-2 py-2 text-center w-12">W</th>
+              <th className="border border-blue-800 px-2 py-2 text-center w-20">Quantity</th>
+              <th className="border border-blue-800 px-2 py-2 text-center w-24">Total Fit</th>
+              <th className="border border-blue-800 px-2 py-2 text-right w-24">Rate</th>
+              <th className="border border-blue-800 px-2 py-2 text-right w-28">Amount</th>
+              <th className="border border-blue-800 px-2 py-2 text-center w-24">Actions</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, i) => (
-              <tr
-                key={item.id}
-                className="border-b border-gray-50 hover:bg-brand-50/30 transition-colors"
-              >
-                <td className="px-3 py-2.5 text-gray-400 font-medium">{i + 1}</td>
-                <td className="px-3 py-2.5">
+              <tr key={item.id} className="hover:bg-blue-50/50 even:bg-gray-50/40">
+                <td className="border border-gray-300 px-2 py-2 text-center text-gray-700 font-medium align-top">{i + 1}</td>
+                <td className="border border-gray-300 px-2 py-2 align-top">
                   <div className="font-medium text-gray-800">{item.description}</div>
-                  <div className="text-xs text-gray-400">
-                    {item.category === "print" ? "Print" : item.category === "frame" ? "Frame" : "Other"}
-                    {item.size ? ` • ${item.size}` : ""}
+                  <div className="text-xs text-gray-500 mt-0.5 flex flex-wrap gap-2">
+                    <span className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px] uppercase">
+                      {item.category}
+                    </span>
+                    {item.size && <span className="text-gray-500">Size: {item.size}</span>}
+                    {item.hsnCode && <span className="text-gray-500">HSN: {item.hsnCode}</span>}
                   </div>
+                  {/* Inline inputs (mirroring the classic register look: editable cells) */}
+                  <ItemRowEditor item={item} onEdit={onEdit} onDelete={onDelete} onDuplicate={onDuplicate} />
                 </td>
-                <td className="px-3 py-2.5 text-right text-gray-600">{formatNum(item.width)}</td>
-                <td className="px-3 py-2.5 text-right text-gray-600">{formatNum(item.wSupport)}</td>
-                <td className="px-3 py-2.5 text-right text-gray-600">{formatNum(item.height)}</td>
-                <td className="px-3 py-2.5 text-right text-gray-600">{formatNum(item.hSupport)}</td>
-                <td className="px-3 py-2.5 text-right text-gray-600">{formatNum(item.quantity)}</td>
-                <td className="px-3 py-2.5 text-right font-medium text-gray-700">
+                <td className="border border-gray-300 px-2 py-2 text-center text-gray-700 align-top bg-blue-50/30">
+                  {item.height > 0 ? item.height : ""}
+                </td>
+                <td className="border border-gray-300 px-1 py-2 text-center align-top bg-blue-100/50"></td>
+                <td className="border border-gray-300 px-2 py-2 text-center text-gray-700 align-top bg-blue-50/30">
+                  {item.width > 0 ? item.width : ""}
+                </td>
+                <td className="border border-gray-300 px-1 py-2 text-center align-top bg-blue-100/50"></td>
+                <td className="border border-gray-300 px-2 py-2 text-center text-gray-700 align-top">{item.quantity || ""}</td>
+                <td className="border border-gray-300 px-2 py-2 text-center text-gray-700 align-top font-medium">
                   {item.totalFit > 0 ? (
-                    <>
-                      {formatNum(item.totalFit)}
-                      <span className="text-xs text-gray-400 ml-1">{item.unit}</span>
-                    </>
-                  ) : (
-                    "-"
-                  )}
+                    <span>{item.totalFit.toFixed(2)} <span className="text-xs text-gray-400">{item.unit}</span></span>
+                  ) : "–"}
                 </td>
-                <td className="px-3 py-2.5 text-right text-gray-600">₹{formatNum(item.rate)}</td>
-                <td className="px-3 py-2.5 text-right font-bold text-gray-800">₹{formatNum(item.amount)}</td>
-                <td className="px-3 py-2.5 text-center">
+                <td className="border border-gray-300 px-2 py-2 text-right text-gray-700 align-top">
+                  {item.rate > 0 ? `₹${item.rate.toFixed(2)}` : ""}
+                </td>
+                <td className="border border-gray-300 px-2 py-2 text-right font-bold text-gray-900 align-top bg-yellow-50/60">
+                  ₹{(item.amount || 0).toFixed(2)}
+                </td>
+                <td className="border border-gray-300 px-1 py-2 text-center align-top">
                   <div className="flex items-center justify-center gap-1">
                     <button
                       onClick={() => onEdit(item)}
-                      className="p-1.5 text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
+                      className="p-1.5 text-orange-600 hover:bg-orange-50 rounded transition-all"
                       title="Edit"
-                    >
-                      ✏️
-                    </button>
+                    ><E.Pencil/></button>
                     <button
                       onClick={() => onDuplicate(item)}
-                      className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-all"
                       title="Duplicate"
-                    >
-                      📄
-                    </button>
+                    ><E.Doc/></button>
                     <button
                       onClick={() => onDelete(item.id)}
-                      className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-all"
                       title="Delete"
-                    >
-                      🗑️
-                    </button>
+                    ><E.Trash/></button>
                   </div>
                 </td>
               </tr>
             ))}
+            {/* Totals row */}
+            <tr className="bg-yellow-50 font-bold">
+              <td className="border border-gray-300 px-2 py-2 text-center" colSpan={6}>TOTAL</td>
+              <td className="border border-gray-300 px-2 py-2 text-center">{totalQty.toFixed(0)}</td>
+              <td className="border border-gray-300 px-2 py-2 text-center">
+                {totalFit > 0 ? totalFit.toFixed(2) : ""}
+              </td>
+              <td className="border border-gray-300 px-2 py-2"></td>
+              <td className="border border-gray-300 px-2 py-2 text-right text-blue-800 text-base">
+                ₹{totalAmount.toFixed(2)}
+              </td>
+              <td className="border border-gray-300 px-2 py-2"></td>
+            </tr>
           </tbody>
         </table>
       </div>
-
-      {/* Mobile Cards */}
-      <div className="lg:hidden divide-y divide-gray-100">
-        {items.map((item, i) => (
-          <div key={item.id} className="p-4">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <span className="text-xs text-gray-400 font-medium">#{i + 1}</span>
-                <h4 className="font-semibold text-gray-800">{item.description}</h4>
-                <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">
-                  {item.category === "print" ? "Print" : item.category === "frame" ? "Frame" : "Other"}
-                </span>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-bold text-gray-800">₹{formatNum(item.amount)}</div>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2 text-xs text-gray-500 mb-2">
-              {item.width > 0 && <div>W: {item.width}</div>}
-              {item.height > 0 && <div>H: {item.height}</div>}
-              <div>Qty: {item.quantity}</div>
-              {item.totalFit > 0 && (
-                <div>
-                  Fit: {formatNum(item.totalFit)} {item.unit}
-                </div>
-              )}
-              <div>Rate: ₹{formatNum(item.rate)}</div>
-              {item.size && <div>Size: {item.size}</div>}
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => onEdit(item)}
-                className="flex-1 text-center py-1.5 text-xs bg-brand-50 text-brand-600 rounded-lg font-medium"
-              >
-                ✏️ Edit
-              </button>
-              <button
-                onClick={() => onDuplicate(item)}
-                className="flex-1 text-center py-1.5 text-xs bg-green-50 text-green-600 rounded-lg font-medium"
-              >
-                📄 Duplicate
-              </button>
-              <button
-                onClick={() => onDelete(item.id)}
-                className="flex-1 text-center py-1.5 text-xs bg-red-50 text-red-500 rounded-lg font-medium"
-              >
-                🗑️ Delete
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
+}
+
+// Inline "editor" is intentionally minimal: the add/edit form above is still the
+// primary place to edit. This component just renders the action buttons.
+function ItemRowEditor(_: { item: LineItem; onEdit: (i: LineItem) => void; onDelete: (id: string) => void; onDuplicate: (i: LineItem) => void; }) {
+  return null;
 }

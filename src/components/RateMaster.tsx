@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { E } from "@/components/emojis";
 
 interface RateRecord {
   id: number;
@@ -31,14 +32,21 @@ export default function RateMaster({ rates, onRateUpdate }: RateMasterProps) {
     setEditValue("");
   };
 
-  const categoryLabel = (cat: string) => {
+  const categoryLabel = (cat: string): React.ReactNode => {
     switch (cat) {
-      case "print": return "🖨️ Print";
-      case "frame": return "🔲 Frame";
-      case "other": return "📦 Other";
+      case "print": return <><span className="inline-block align-[-0.15em] mr-1"><E.Printer/></span>Print</>;
+      case "frame": return <><span className="inline-block align-[-0.15em] mr-1"><E.Box/></span>Frame</>;
+      case "other": return <><span className="inline-block align-[-0.15em] mr-1"><E.Box/></span>Other</>;
       default: return cat;
     }
   };
+
+  const filters: { key: string; label: React.ReactNode }[] = [
+    { key: "all", label: "All" },
+    { key: "print", label: <><span className="inline-block align-[-0.15em] mr-1"><E.Printer/></span>Print</> },
+    { key: "frame", label: <><span className="inline-block align-[-0.15em] mr-1"><E.Box/></span>Frame</> },
+    { key: "other", label: <><span className="inline-block align-[-0.15em] mr-1"><E.Box/></span>Other</> },
+  ];
 
   const categoryColor = (cat: string) => {
     switch (cat) {
@@ -54,19 +62,14 @@ export default function RateMaster({ rates, onRateUpdate }: RateMasterProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
-            💰 Rate Master
+            <E.Money/> Rate Master
           </h2>
           <p className="text-sm text-gray-500 mb-4">
             Default rates auto-fill when creating estimates. HSN codes appear on Tax Invoices.
           </p>
 
           <div className="flex gap-2">
-            {[
-              { key: "all", label: "All" },
-              { key: "print", label: "🖨️ Print" },
-              { key: "frame", label: "🔲 Frame" },
-              { key: "other", label: "📦 Other" },
-            ].map((f) => (
+            {filters.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setFilter(f.key)}
@@ -149,7 +152,7 @@ export default function RateMaster({ rates, onRateUpdate }: RateMasterProps) {
                       onClick={() => { setEditingId(rate.id); setEditValue(rate.defaultRate.toString()); }}
                       className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-200"
                     >
-                      ✏️ Edit Rate
+                      <E.Pencil/> Edit Rate
                     </button>
                   )}
                 </div>

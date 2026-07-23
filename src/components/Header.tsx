@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { E } from "@/components/emojis";
 
 interface HeaderProps {
   currentPage: string;
@@ -12,26 +13,28 @@ interface HeaderProps {
   onLogout?: () => void;
 }
 
+type NavItem = { key: string; label: string; icon: React.ReactNode };
+
 export default function Header({ currentPage, onNavigate, darkMode, onToggleDarkMode, userName, userRole, onLogout }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems = [
-    { key: "dashboard", label: "Dashboard", icon: "📊" },
-    { key: "invoice", label: "Invoice", icon: "📄" },
-    { key: "quotation", label: "Quotation", icon: "📋" },
-    { key: "calculate", label: "Calculate", icon: "🧮" },
-    { key: "payments", label: "Payments", icon: "💰" },
-    { key: "customers", label: "Customers", icon: "👥" },
-    { key: "accounts", label: "Accounts", icon: "📒" },
-    { key: "reports", label: "Reports", icon: "📊" },
+  const navItems: NavItem[] = [
+    { key: "dashboard", label: "Dashboard", icon: <E.Chart/> },
+    { key: "invoice", label: "Invoice", icon: <E.Doc/> },
+    { key: "quotation", label: "Quotation", icon: <E.Clipboard/> },
+    { key: "calculate", label: "Calculate", icon: <E.Calc/> },
+    { key: "payments", label: "Payments", icon: <E.Money/> },
+    { key: "customers", label: "Customers", icon: <E.Users/> },
+    { key: "accounts", label: "Accounts", icon: <E.Ledger/> },
+    { key: "reports", label: "Reports", icon: <E.Chart/> },
   ];
 
-  const moreItems = [
-    { key: "history", label: "History", icon: "📜" },
-    { key: "rates", label: "Rate Master", icon: "💵" },
-    { key: "search", label: "Search", icon: "🔍" },
-    { key: "trash", label: "Trash", icon: "🗑️" },
-    { key: "settings", label: "Settings", icon: "⚙️" },
+  const moreItems: NavItem[] = [
+    { key: "history", label: "History", icon: <E.Scroll/> },
+    { key: "rates", label: "Rate Master", icon: <E.Cash/> },
+    { key: "search", label: "Search", icon: <E.Search/> },
+    { key: "trash", label: "Trash", icon: <E.Trash/> },
+    { key: "settings", label: "Settings", icon: <E.Gear/> },
   ];
 
   return (
@@ -61,15 +64,15 @@ export default function Header({ currentPage, onNavigate, darkMode, onToggleDark
                     : "text-brand-100 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <span className="mr-1">{item.icon}</span>
+                <span className="mr-1 inline-block align-[-0.15em]">{item.icon}</span>
                 {item.label}
               </button>
             ))}
-            
+
             {/* More dropdown */}
             <div className="relative group">
               <button className="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-100 hover:bg-white/10 hover:text-white transition-all">
-                More ▾
+                More <span className="text-xs">▾</span>
               </button>
               <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl shadow-xl border border-gray-100 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                 {moreItems.map((item) => (
@@ -82,7 +85,7 @@ export default function Header({ currentPage, onNavigate, darkMode, onToggleDark
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
-                    <span className="mr-2">{item.icon}</span>
+                    <span className="mr-2 inline-block align-[-0.15em]">{item.icon}</span>
                     {item.label}
                   </button>
                 ))}
@@ -95,7 +98,7 @@ export default function Header({ currentPage, onNavigate, darkMode, onToggleDark
               className="ml-1 p-2 rounded-lg text-brand-100 hover:bg-white/10 hover:text-white transition-all"
               title={darkMode ? "Light mode" : "Dark mode"}
             >
-              {darkMode ? "☀️" : "🌙"}
+              {darkMode ? <E.Sun/> : <E.Moon/>}
             </button>
             {userName && (
               <div className="relative group ml-1">
@@ -108,8 +111,8 @@ export default function Header({ currentPage, onNavigate, darkMode, onToggleDark
                     <div className="font-semibold text-gray-800 text-sm">{userName}</div>
                     <div className="text-xs text-gray-400 capitalize">{userRole}</div>
                   </div>
-                  <button onClick={() => onNavigate("settings")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">⚙️ Settings</button>
-                  {onLogout && <button onClick={onLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">🚪 Logout</button>}
+                  <button onClick={() => onNavigate("settings")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"><span className="mr-2 inline-block align-[-0.15em]"><E.Gear/></span> Settings</button>
+                  {onLogout && <button onClick={onLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"><span className="mr-2 inline-block align-[-0.15em]"><E.Door/></span> Logout</button>}
                 </div>
               </div>
             )}
@@ -117,23 +120,14 @@ export default function Header({ currentPage, onNavigate, darkMode, onToggleDark
 
           {/* Mobile: Quick actions + menu */}
           <div className="flex items-center gap-1 lg:hidden">
-            <button
-              onClick={() => onNavigate("search")}
-              className="p-2 rounded-lg text-brand-100 hover:bg-white/10"
-            >
-              🔍
+            <button onClick={() => onNavigate("search")} className="p-2 rounded-lg text-brand-100 hover:bg-white/10">
+              <E.Search/>
             </button>
-            <button
-              onClick={onToggleDarkMode}
-              className="p-2 rounded-lg text-brand-100 hover:bg-white/10"
-            >
-              {darkMode ? "☀️" : "🌙"}
+            <button onClick={onToggleDarkMode} className="p-2 rounded-lg text-brand-100 hover:bg-white/10">
+              {darkMode ? <E.Sun/> : <E.Moon/>}
             </button>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-brand-100 hover:bg-white/10 text-lg"
-            >
-              {mobileMenuOpen ? "✕" : "☰"}
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 rounded-lg text-brand-100 hover:bg-white/10 text-lg">
+              {mobileMenuOpen ? <E.X/> : <E.Menu/>}
             </button>
           </div>
         </div>
@@ -155,7 +149,7 @@ export default function Header({ currentPage, onNavigate, darkMode, onToggleDark
                       : "text-brand-100 hover:bg-white/10"
                   }`}
                 >
-                  <span className="text-lg">{item.icon}</span>
+                  <span className="text-lg inline-flex">{item.icon}</span>
                   {item.label}
                 </button>
               ))}

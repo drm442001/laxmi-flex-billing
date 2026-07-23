@@ -1,6 +1,8 @@
 "use client";
 
+import { type ReactNode } from "react";
 import { formatCurrency, formatDateTime, DocumentType } from "@/lib/constants";
+import { E } from "@/components/emojis";
 
 interface EstimateRecord {
   id: number;
@@ -27,13 +29,13 @@ interface EstimateHistoryProps {
 
 export default function EstimateHistory({ estimates, onLoad, onDelete, onConvert, loading, type }: EstimateHistoryProps) {
   const typeLabel = type === "invoice" ? "Invoices" : type === "quotation" ? "Quotations" : "Calculations";
-  const typeIcon = type === "invoice" ? "📄" : type === "quotation" ? "📋" : "🧮";
+  const typeIcon: ReactNode = type === "invoice" ? <E.Doc/> : type === "quotation" ? <E.Clipboard/> : <E.Calc/>;
 
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-          <div className="text-3xl mb-3 animate-pulse">⏳</div>
+          <div className="text-3xl mb-3 animate-pulse"><E.Hourglass/></div>
           <p className="text-gray-400">Loading {typeLabel.toLowerCase()}...</p>
         </div>
       </div>
@@ -51,17 +53,17 @@ export default function EstimateHistory({ estimates, onLoad, onDelete, onConvert
       {type === "invoice" && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 text-white">
-            <div className="text-xl mb-1">📄</div>
+            <div className="text-xl mb-1"><E.Doc/></div>
             <div className="text-xl font-bold">{estimates.length}</div>
             <div className="text-xs text-white/80">Total Invoices</div>
           </div>
           <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-4 text-white">
-            <div className="text-xl mb-1">✅</div>
+            <div className="text-xl mb-1"><E.Check/></div>
             <div className="text-lg font-bold">{formatCurrency(paidAmount)}</div>
             <div className="text-xs text-white/80">Received</div>
           </div>
           <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-4 text-white">
-            <div className="text-xl mb-1">⏳</div>
+            <div className="text-xl mb-1"><E.Hourglass/></div>
             <div className="text-lg font-bold">{formatCurrency(pendingAmount)}</div>
             <div className="text-xs text-white/80">Pending</div>
           </div>
@@ -140,7 +142,7 @@ export default function EstimateHistory({ estimates, onLoad, onDelete, onConvert
                         onClick={() => onLoad(est.id)}
                         className="px-3 py-2 bg-brand-50 text-brand-600 rounded-lg text-xs font-medium hover:bg-brand-100 transition-all"
                       >
-                        📂 Open
+                        <E.Folder/> Open
                       </button>
                       {(type === "quotation" || type === "calculation") && est.status !== "converted" && (
                         <button
@@ -148,7 +150,7 @@ export default function EstimateHistory({ estimates, onLoad, onDelete, onConvert
                           className="px-3 py-2 bg-green-50 text-green-600 rounded-lg text-xs font-medium hover:bg-green-100 transition-all"
                           title="Convert to Invoice"
                         >
-                          📄 To Invoice
+                          <E.Doc/> To Invoice
                         </button>
                       )}
                       <button
@@ -159,7 +161,7 @@ export default function EstimateHistory({ estimates, onLoad, onDelete, onConvert
                         }}
                         className="px-3 py-2 bg-red-50 text-red-500 rounded-lg text-xs font-medium hover:bg-red-100 transition-all"
                       >
-                        🗑️
+                        <E.Trash/>
                       </button>
                     </div>
                   </div>

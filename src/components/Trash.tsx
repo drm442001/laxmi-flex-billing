@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { formatCurrency, formatDateTime } from "@/lib/constants";
+import { E } from "@/components/emojis";
 
 interface TrashedItem {
   id: number;
@@ -88,7 +89,7 @@ export default function Trash({ showToast }: TrashProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-4xl animate-pulse">🗑️</div>
+        <div className="text-4xl animate-pulse"><E.Trash/></div>
       </div>
     );
   }
@@ -99,7 +100,7 @@ export default function Trash({ showToast }: TrashProps) {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            🗑️ Trash
+            <E.Trash/> Trash
           </h2>
           <p className="text-sm text-gray-400">
             Deleted items can be restored or permanently removed
@@ -110,7 +111,7 @@ export default function Trash({ showToast }: TrashProps) {
             onClick={handleEmptyTrash}
             className="px-4 py-2 bg-red-500 text-white rounded-xl font-semibold text-sm hover:bg-red-600 transition-all"
           >
-            🗑️ Empty Trash
+            <E.Trash/> Empty Trash
           </button>
         )}
       </div>
@@ -119,7 +120,7 @@ export default function Trash({ showToast }: TrashProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {items.length === 0 ? (
           <div className="p-12 text-center">
-            <div className="text-5xl mb-4">🧹</div>
+            <div className="text-5xl mb-4"><E.Broom/></div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Trash is Empty</h3>
             <p className="text-gray-400 text-sm">
               Deleted invoices, quotations, and calculations will appear here.
@@ -131,8 +132,8 @@ export default function Trash({ showToast }: TrashProps) {
               <div key={item.id} className="p-4 hover:bg-gray-50 transition-colors">
                 <div className="flex flex-col sm:flex-row justify-between gap-3">
                   <div className="flex items-start gap-3">
-                    <span className="text-2xl">
-                      {item.type === "invoice" ? "📄" : item.type === "quotation" ? "📋" : "🧮"}
+                    <span className="text-2xl inline-flex items-center">
+                      {item.type === "invoice" ? <E.Doc/> : item.type === "quotation" ? <E.Clipboard/> : <E.Calc/>}
                     </span>
                     <div>
                       <div className="font-semibold text-gray-800">{item.invoiceNumber}</div>
@@ -154,13 +155,13 @@ export default function Trash({ showToast }: TrashProps) {
                         onClick={() => handleRestore(item.id)}
                         className="px-3 py-2 bg-green-50 text-green-600 rounded-lg text-xs font-medium hover:bg-green-100"
                       >
-                        ↩️ Restore
+                        <E.Undo/> Restore
                       </button>
                       <button
                         onClick={() => handlePermanentDelete(item.id)}
                         className="px-3 py-2 bg-red-50 text-red-500 rounded-lg text-xs font-medium hover:bg-red-100"
                       >
-                        ✕ Delete
+                        <E.X/> Delete
                       </button>
                     </div>
                   </div>
@@ -173,7 +174,7 @@ export default function Trash({ showToast }: TrashProps) {
 
       {/* Info */}
       <div className="bg-yellow-50 rounded-xl border border-yellow-200 p-4 text-sm text-yellow-800">
-        <strong>⚠️ Note:</strong> Items in trash can be restored at any time. Permanently deleted items cannot be recovered.
+        <strong><E.Warn/> Note:</strong> Items in trash can be restored at any time. Permanently deleted items cannot be recovered.
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { PAYMENT_METHODS, formatCurrency, formatDate, PaymentMethod } from "@/lib/constants";
+import { E } from "@/components/emojis";
 
 interface Payment {
   id: number;
@@ -125,7 +126,7 @@ export default function Payments({ showToast }: PaymentsProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-4xl animate-pulse">💰</div>
+        <div className="text-4xl animate-pulse"><E.Money/></div>
       </div>
     );
   }
@@ -135,17 +136,17 @@ export default function Payments({ showToast }: PaymentsProps) {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-5 text-white">
-          <div className="text-3xl mb-1">💰</div>
+          <div className="text-3xl mb-1"><E.Money/></div>
           <div className="text-2xl font-bold">{formatCurrency(totalReceived)}</div>
           <div className="text-sm text-white/80">Total Received</div>
         </div>
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-5 text-white">
-          <div className="text-3xl mb-1">⏳</div>
+          <div className="text-3xl mb-1"><E.Hourglass/></div>
           <div className="text-2xl font-bold">{formatCurrency(totalPending)}</div>
           <div className="text-sm text-white/80">Total Pending</div>
         </div>
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-5 text-white">
-          <div className="text-3xl mb-1">📄</div>
+          <div className="text-3xl mb-1"><E.Doc/></div>
           <div className="text-2xl font-bold">{pendingInvoices.length}</div>
           <div className="text-sm text-white/80">Pending Invoices</div>
         </div>
@@ -153,7 +154,7 @@ export default function Payments({ showToast }: PaymentsProps) {
 
       {/* Add Payment Button */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800">💳 Payment History</h2>
+        <h2 className="text-xl font-bold text-gray-800"><E.Card/> Payment History</h2>
         <button
           onClick={() => setShowAddModal(true)}
           className="px-4 py-2 bg-brand-600 text-white rounded-xl font-semibold text-sm hover:bg-brand-700 transition-all"
@@ -165,7 +166,7 @@ export default function Payments({ showToast }: PaymentsProps) {
       {/* Pending Invoices */}
       {pendingInvoices.length > 0 && (
         <div className="bg-orange-50 rounded-2xl border border-orange-200 p-5">
-          <h3 className="font-bold text-orange-800 mb-3">⏳ Pending Payments</h3>
+          <h3 className="font-bold text-orange-800 mb-3"><E.Hourglass/> Pending Payments</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {pendingInvoices.slice(0, 6).map((inv) => (
               <div
@@ -173,8 +174,8 @@ export default function Payments({ showToast }: PaymentsProps) {
                 className="bg-white rounded-xl p-3 border border-orange-100 flex justify-between items-center"
               >
                 <div>
-                  <div className="font-semibold text-sm text-gray-800">{inv.invoiceNumber}</div>
-                  <div className="text-xs text-gray-400">{inv.customerName || "Walk-in"}</div>
+                  <div className="font-bold text-sm text-gray-800">{inv.customerName || "Walk-in"}</div>
+                  <div className="text-xs text-gray-500">{inv.invoiceNumber}</div>
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-orange-600">{formatCurrency(inv.balanceAmount)}</div>
@@ -199,7 +200,7 @@ export default function Payments({ showToast }: PaymentsProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {payments.length === 0 ? (
           <div className="p-12 text-center">
-            <div className="text-4xl mb-3">💸</div>
+            <div className="text-4xl mb-3"><E.RupeeCircle/></div>
             <p className="text-gray-400">No payments recorded yet</p>
           </div>
         ) : (
@@ -224,8 +225,7 @@ export default function Payments({ showToast }: PaymentsProps) {
                     <td className="px-4 py-3 font-medium text-brand-700">{payment.invoiceNumber}</td>
                     <td className="px-4 py-3 text-gray-600">{payment.customerName || "Walk-in"}</td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-1 bg-gray-100 rounded-lg text-xs">
-                        {PAYMENT_METHODS.find((m) => m.value === payment.paymentMethod)?.icon}{" "}
+                      <span className="px-2 py-1 bg-gray-100 rounded-lg text-xs capitalize">
                         {payment.paymentMethod}
                       </span>
                     </td>
@@ -246,9 +246,9 @@ export default function Payments({ showToast }: PaymentsProps) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
             <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
-              <h3 className="font-bold text-lg">💰 Record Payment</h3>
+              <h3 className="font-bold text-lg"><E.Money/> Record Payment</h3>
               <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600 text-xl">
-                ✕
+                <E.X/>
               </button>
             </div>
             <div className="p-5 space-y-4">
@@ -325,7 +325,7 @@ export default function Payments({ showToast }: PaymentsProps) {
                           : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
-                      {method.icon} {method.label}
+                      {method.label}
                     </button>
                   ))}
                 </div>
@@ -363,7 +363,7 @@ export default function Payments({ showToast }: PaymentsProps) {
                 onClick={handleAddPayment}
                 className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-xl font-semibold text-sm hover:bg-green-700"
               >
-                💰 Record Payment
+                <E.Money/> Record Payment
               </button>
             </div>
           </div>

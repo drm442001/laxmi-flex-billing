@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { estimates, payments, expenses, purchases, customers, estimateItems } from "@/db/schema";
 import { sql, and, gte, lte, eq, desc } from "drizzle-orm";
+import { requirePermission } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
+  const auth = await requirePermission(req, "reports.view");
+  if (auth instanceof Response) return auth;
   try {
     const searchParams = req.nextUrl.searchParams;
     const reportType = searchParams.get("type") || "daily";
@@ -28,7 +31,6 @@ export async function GET(req: NextRequest) {
       lte(estimates.invoiceDate, dateTo)
     );
 
-    // Sales
     const [salesData] = await db
       .select({
         totalInvoices: sql<number>`count(*) filter (where ${estimates.type} = 'invoice')`,
@@ -41,7 +43,6 @@ export async function GET(req: NextRequest) {
       .from(estimates)
       .where(dateFilter);
 
-    // Payments
     const [paymentsData] = await db
       .select({
         totalPayments: sql<number>`count(*)`,
@@ -54,7 +55,6 @@ export async function GET(req: NextRequest) {
       .from(payments)
       .where(and(eq(payments.isDeleted, false), gte(payments.paymentDate, dateFrom), lte(payments.paymentDate, dateTo)));
 
-    // Expenses
     const [expensesData] = await db
       .select({
         totalExpenses: sql<number>`count(*)`,
@@ -63,7 +63,6 @@ export async function GET(req: NextRequest) {
       .from(expenses)
       .where(and(eq(expenses.isDeleted, false), gte(expenses.expenseDate, dateFrom), lte(expenses.expenseDate, dateTo)));
 
-    // Purchases
     const [purchasesData] = await db
       .select({
         totalPurchases: sql<number>`count(*)`,
@@ -74,7 +73,6 @@ export async function GET(req: NextRequest) {
       .from(purchases)
       .where(and(eq(purchases.isDeleted, false), gte(purchases.purchaseDate, dateFrom), lte(purchases.purchaseDate, dateTo)));
 
-    // Top customers
     const topCustomers = await db
       .select({ id: customers.id, name: customers.name, totalBusiness: customers.totalBusiness, balance: customers.balance })
       .from(customers)
@@ -82,7 +80,6 @@ export async function GET(req: NextRequest) {
       .orderBy(desc(customers.totalBusiness))
       .limit(10);
 
-    // Top selling items — query estimate_items joined with estimates in date range
     const topItems = await db
       .select({
         description: estimateItems.description,
@@ -104,7 +101,6 @@ export async function GET(req: NextRequest) {
       .orderBy(desc(sql`coalesce(sum(${estimateItems.amount}), 0)`))
       .limit(10);
 
-    // Pending payments list
     const pendingPayments = await db
       .select({
         id: estimates.id,
@@ -129,7 +125,6 @@ export async function GET(req: NextRequest) {
 
     const profit = Number(salesData?.totalPaid || 0) - Number(expensesData?.totalAmount || 0) - Number(purchasesData?.totalPaid || 0);
 
-    // Ensure all count values are numbers (PostgreSQL count returns bigint as string)
     const numSales = salesData ? {
       totalInvoices: Number(salesData.totalInvoices) || 0,
       totalSales: Number(salesData.totalSales) || 0,
@@ -137,7 +132,7 @@ export async function GET(req: NextRequest) {
       totalPending: Number(salesData.totalPending) || 0,
       totalQuotations: Number(salesData.totalQuotations) || 0,
       quotationValue: Number(salesData.quotationValue) || 0,
-    } : { totalInvoices:0,totalSales:0,totalPaid:0,totalPending:0,totalQuotations:0,quotationValue:0 };
+    } : { totalInvoices: 0, totalSales: 0, totalPaid: 0, totalPending: 0, totalQuotations: 0, quotationValue: 0 };
 
     const numPayments = paymentsData ? {
       totalPayments: Number(paymentsData.totalPayments) || 0,
@@ -146,19 +141,19 @@ export async function GET(req: NextRequest) {
       upiAmount: Number(paymentsData.upiAmount) || 0,
       bankAmount: Number(paymentsData.bankAmount) || 0,
       chequeAmount: Number(paymentsData.chequeAmount) || 0,
-    } : { totalPayments:0,totalAmount:0,cashAmount:0,upiAmount:0,bankAmount:0,chequeAmount:0 };
+    } : { totalPayments: 0, totalAmount: 0, cashAmount: 0, upiAmount: 0, bankAmount: 0, chequeAmount: 0 };
 
     const numExpenses = expensesData ? {
       totalExpenses: Number(expensesData.totalExpenses) || 0,
       totalAmount: Number(expensesData.totalAmount) || 0,
-    } : { totalExpenses:0,totalAmount:0 };
+    } : { totalExpenses: 0, totalAmount: 0 };
 
     const numPurchases = purchasesData ? {
       totalPurchases: Number(purchasesData.totalPurchases) || 0,
       totalAmount: Number(purchasesData.totalAmount) || 0,
       totalPaid: Number(purchasesData.totalPaid) || 0,
       totalPending: Number(purchasesData.totalPending) || 0,
-    } : { totalPurchases:0,totalAmount:0,totalPaid:0,totalPending:0 };
+    } : { totalPurchases: 0, totalAmount: 0, totalPaid: 0, totalPending: 0 };
 
     return NextResponse.json({
       period: { from: dateFrom, to: dateTo, type: reportType },

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { formatCurrency, INDIAN_STATES } from "@/lib/constants";
+import { E } from "@/components/emojis";
 
 interface Customer {
   id: number;
@@ -164,17 +165,17 @@ export default function CustomerList({ showToast, onViewStatement }: CustomerLis
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-5 text-white">
-          <div className="text-3xl mb-1">👥</div>
+          <div className="text-3xl mb-1"><E.Users/></div>
           <div className="text-2xl font-bold">{customers.length}</div>
           <div className="text-sm text-white/80">Total Customers</div>
         </div>
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-5 text-white">
-          <div className="text-3xl mb-1">💰</div>
+          <div className="text-3xl mb-1"><E.Money/></div>
           <div className="text-2xl font-bold">{formatCurrency(totalBusiness)}</div>
           <div className="text-sm text-white/80">Total Business</div>
         </div>
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-5 text-white">
-          <div className="text-3xl mb-1">⏳</div>
+          <div className="text-3xl mb-1"><E.Hourglass/></div>
           <div className="text-2xl font-bold">{formatCurrency(totalBalance)}</div>
           <div className="text-sm text-white/80">Total Outstanding</div>
         </div>
@@ -184,7 +185,7 @@ export default function CustomerList({ showToast, onViewStatement }: CustomerLis
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
         <div className="relative flex-1 w-full sm:max-w-xs">
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search customers..." className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500" />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><E.Search/></span>
         </div>
         <button onClick={() => { setEditingCustomer(null); setFormData({ ...emptyForm }); setDuplicateWarning(null); setShowModal(true); }} className="px-4 py-2 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700">
           + Add Customer
@@ -194,9 +195,9 @@ export default function CustomerList({ showToast, onViewStatement }: CustomerLis
       {/* Customer List */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center"><div className="text-4xl animate-pulse">👥</div></div>
+          <div className="p-12 text-center"><div className="text-4xl animate-pulse"><E.Users/></div></div>
         ) : customers.length === 0 ? (
-          <div className="p-12 text-center"><div className="text-4xl mb-3">👤</div><p className="text-gray-400">No customers found</p></div>
+          <div className="p-12 text-center"><div className="text-4xl mb-3"><E.User/></div><p className="text-gray-400">No customers found</p></div>
         ) : (
           <div className="divide-y divide-gray-50">
             {customers.map((c) => {
@@ -215,9 +216,9 @@ export default function CustomerList({ showToast, onViewStatement }: CustomerLis
                           {c.gstNumber && <span className="text-[10px] bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded-full">GST</span>}
                         </div>
                         <div className="text-xs text-gray-400 flex flex-wrap gap-x-3 mt-0.5">
-                          {c.phone && <span>📱 {c.phone}</span>}
-                          {c.email && <span>✉️ {c.email}</span>}
-                          {c.city && <span>📍 {c.city}</span>}
+                          {c.phone && <span><E.Mobile/> {c.phone}</span>}
+                          {c.email && <span><E.Mail/> {c.email}</span>}
+                          {c.city && <span><E.Pin/> {c.city}</span>}
                         </div>
                         {c.creditLimit > 0 && (
                           <div className="text-[10px] text-gray-400 mt-0.5">
@@ -230,9 +231,9 @@ export default function CustomerList({ showToast, onViewStatement }: CustomerLis
                       <div className="text-right"><div className="text-xs text-gray-400">Business</div><div className="font-semibold text-sm">{formatCurrency(c.totalBusiness || 0)}</div></div>
                       <div className="text-right"><div className="text-xs text-gray-400">Balance</div><div className={`font-semibold text-sm ${(c.balance || 0) > 0 ? "text-orange-600" : "text-green-600"}`}>{formatCurrency(c.balance || 0)}</div></div>
                       <div className="flex gap-1">
-                        <button onClick={() => onViewStatement(c.id)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="Statement">📊</button>
-                        <button onClick={() => openEditModal(c)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit">✏️</button>
-                        <button onClick={() => handleDelete(c.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="Delete">🗑️</button>
+                        <button onClick={() => onViewStatement(c.id)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="Statement"><E.Chart/></button>
+                        <button onClick={() => openEditModal(c)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit"><E.Pencil/></button>
+                        <button onClick={() => handleDelete(c.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="Delete"><E.Trash/></button>
                       </div>
                     </div>
                   </div>
@@ -248,13 +249,13 @@ export default function CustomerList({ showToast, onViewStatement }: CustomerLis
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
-              <h3 className="font-bold text-lg">{editingCustomer ? "✏️ Edit Customer" : "👤 Add Customer"}</h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              <h3 className="font-bold text-lg flex items-center gap-2">{editingCustomer ? <><E.Pencil/> Edit Customer</> : <><E.User/> Add Customer</>}</h3>
+              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 text-xl"><E.X/></button>
             </div>
 
             {duplicateWarning && (
               <div className="mx-5 mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-800">
-                ⚠️ {duplicateWarning}
+                <E.Warn/> {duplicateWarning}
               </div>
             )}
 
@@ -315,7 +316,7 @@ export default function CustomerList({ showToast, onViewStatement }: CustomerLis
 
               {/* Credit */}
               <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <h4 className="font-semibold text-gray-700 text-sm mb-3">💳 Credit Settings</h4>
+                <h4 className="font-semibold text-gray-700 text-sm mb-3"><E.Card/> Credit Settings</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className={lbl}>Credit Limit (₹)</label>

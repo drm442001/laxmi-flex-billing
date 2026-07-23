@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { INDIAN_STATES } from "@/lib/constants";
+import { E } from "@/components/emojis";
 
 interface CompanySettings {
   id?: number;
@@ -144,19 +145,19 @@ export default function Settings({ showToast }: SettingsProps) {
   const inputClass = "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white";
   const labelClass = "block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide";
 
-  const tabs = [
-    { key: "company", label: "🏢 Company", icon: "🏢" },
-    { key: "bank", label: "🏦 Bank", icon: "🏦" },
-    { key: "invoice", label: "📄 Invoice", icon: "📄" },
-    { key: "gst", label: "💰 GST", icon: "💰" },
-    { key: "print", label: "🖨️ Print", icon: "🖨️" },
-    { key: "backup", label: "💾 Backup", icon: "💾" },
+  const tabs: { key: string; label: React.ReactNode; icon: React.ReactNode }[] = [
+    { key: "company", label: <><span className="inline-block align-[-0.15em] mr-1"><E.Building/></span>Company</>, icon: <E.Building/> },
+    { key: "bank", label: <><span className="inline-block align-[-0.15em] mr-1"><E.Bank/></span>Bank</>, icon: <E.Bank/> },
+    { key: "invoice", label: <><span className="inline-block align-[-0.15em] mr-1"><E.Doc/></span>Invoice</>, icon: <E.Doc/> },
+    { key: "gst", label: <><span className="inline-block align-[-0.15em] mr-1"><E.Money/></span>GST</>, icon: <E.Money/> },
+    { key: "print", label: <><span className="inline-block align-[-0.15em] mr-1"><E.Printer/></span>Print</>, icon: <E.Printer/> },
+    { key: "backup", label: <><span className="inline-block align-[-0.15em] mr-1"><E.Save/></span>Backup</>, icon: <E.Save/> },
   ];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-4xl animate-pulse">⚙️</div>
+        <div className="text-4xl animate-pulse"><E.Gear/></div>
       </div>
     );
   }
@@ -166,7 +167,7 @@ export default function Settings({ showToast }: SettingsProps) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">⚙️ Enterprise Settings</h2>
+          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2"><E.Gear/> Enterprise Settings</h2>
           <p className="text-sm text-gray-500">Configure your business settings</p>
         </div>
         <button
@@ -174,7 +175,7 @@ export default function Settings({ showToast }: SettingsProps) {
           disabled={saving}
           className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center gap-2"
         >
-          {saving ? "⏳ Saving..." : "💾 Save All Settings"}
+          {saving ? <><span className="inline-block align-[-0.15em]"><E.Hourglass/></span> Saving...</> : <><span className="inline-block align-[-0.15em]"><E.Save/></span> Save All Settings</>}
         </button>
       </div>
 
@@ -198,7 +199,7 @@ export default function Settings({ showToast }: SettingsProps) {
       {/* Company Tab */}
       {activeTab === "company" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
-          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3">🏢 Company Information</h3>
+          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3"><E.Building/> Company Information</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -256,7 +257,7 @@ export default function Settings({ showToast }: SettingsProps) {
           </div>
 
           <div className="pt-4 border-t border-gray-100">
-            <h4 className="font-semibold text-gray-700 mb-3">📷 Uploads</h4>
+            <h4 className="font-semibold text-gray-700 mb-3"><E.Camera/> Uploads</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className={labelClass}>Logo URL</label>
@@ -281,7 +282,7 @@ export default function Settings({ showToast }: SettingsProps) {
       {/* Bank Tab */}
       {activeTab === "bank" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
-          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3">🏦 Bank Details</h3>
+          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3"><E.Bank/> Bank Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Bank Name</label>
@@ -310,7 +311,7 @@ export default function Settings({ showToast }: SettingsProps) {
       {/* Invoice Tab */}
       {activeTab === "invoice" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
-          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3">📄 Invoice Settings</h3>
+          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3"><E.Doc/> Invoice Settings</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className={labelClass}>Invoice Prefix</label>
@@ -357,7 +358,7 @@ export default function Settings({ showToast }: SettingsProps) {
       {/* GST Tab */}
       {activeTab === "gst" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
-          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3">💰 GST Settings</h3>
+          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3"><E.Money/> GST Settings</h3>
           <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -398,7 +399,7 @@ export default function Settings({ showToast }: SettingsProps) {
       {/* Print Tab */}
       {activeTab === "print" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
-          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3">🖨️ Print Settings</h3>
+          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3"><E.Printer/> Print Settings</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Default Print Size</label>
@@ -429,7 +430,7 @@ export default function Settings({ showToast }: SettingsProps) {
       {/* Backup Tab */}
       {activeTab === "backup" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
-          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3">💾 Backup & Reminders</h3>
+          <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3"><E.Save/> Backup & Reminders</h3>
           
           <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -477,7 +478,7 @@ export default function Settings({ showToast }: SettingsProps) {
 
           {/* Backup Action Section */}
           <div className="pt-6 mt-6 border-t border-gray-100">
-            <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">🛡️ Database Safety</h4>
+            <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2"><E.Shield/> Database Safety</h4>
             <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-center gap-4">
               <div>
                 <p className="text-emerald-900 font-bold">Manual Data Export</p>
@@ -487,7 +488,7 @@ export default function Settings({ showToast }: SettingsProps) {
                 onClick={() => { window.location.href = "/api/backup"; }}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2"
               >
-                📥 Download Backup (.json)
+                <E.Inbox/> Download Backup (.json)
               </button>
             </div>
           </div>
@@ -496,7 +497,7 @@ export default function Settings({ showToast }: SettingsProps) {
 
       {/* About */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-6 text-center text-white">
-        <div className="text-4xl mb-2">🖨️</div>
+        <div className="text-4xl mb-2"><E.Printer/></div>
         <h3 className="font-bold text-xl">{settings.companyName}</h3>
         <p className="text-blue-200 text-sm">{settings.city}, {settings.state}</p>
         <p className="text-xs text-blue-300 mt-2">Enterprise Billing System v2.0</p>

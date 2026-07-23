@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { formatCurrency, formatDate } from "@/lib/constants";
+import { E } from "@/components/emojis";
 
 interface DashboardData {
   todaySales: number;
@@ -80,7 +81,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="text-4xl mb-3 animate-bounce">📊</div>
+          <div className="text-4xl mb-3 animate-bounce"><E.Chart/></div>
           <p className="text-gray-400">Loading dashboard...</p>
         </div>
       </div>
@@ -97,27 +98,27 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     <div className="space-y-5">
       {/* Top Stats Row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <StatCard icon="📅" label="Today's Sales" value={formatCurrency(data.todaySales)} subtext={`${data.todayInvoices} invoices`} gradient="from-blue-500 to-blue-600" />
-        <StatCard icon="📆" label="Monthly Sales" value={formatCurrency(data.monthlySales)} subtext={`${data.monthlyInvoices} invoices`} gradient="from-indigo-500 to-indigo-600" />
-        <StatCard icon="⏳" label="Outstanding" value={formatCurrency(data.totalOutstanding)} subtext={`${data.pendingInvoicesCount} pending`} gradient="from-orange-500 to-orange-600" />
-        <StatCard icon="💸" label="Expenses" value={formatCurrency(data.monthlyExpenses)} subtext="This month" gradient="from-red-500 to-red-600" />
-        <StatCard icon="💰" label="Cash Balance" value={formatCurrency(data.cashBalance)} gradient="from-green-500 to-green-600" />
-        <StatCard icon="📈" label="Profit" value={formatCurrency(data.profit)} subtext={`${data.growthPercent >= 0 ? "+" : ""}${data.growthPercent}%`} gradient={data.profit >= 0 ? "from-emerald-500 to-emerald-600" : "from-red-500 to-red-600"} />
+        <StatCard icon={<E.Calendar/>} label="Today's Sales" value={formatCurrency(data.todaySales)} subtext={`${data.todayInvoices} invoices`} gradient="from-blue-500 to-blue-600" />
+        <StatCard icon={<E.Calendar/>} label="Monthly Sales" value={formatCurrency(data.monthlySales)} subtext={`${data.monthlyInvoices} invoices`} gradient="from-indigo-500 to-indigo-600" />
+        <StatCard icon={<E.Hourglass/>} label="Outstanding" value={formatCurrency(data.totalOutstanding)} subtext={`${data.pendingInvoicesCount} pending`} gradient="from-orange-500 to-orange-600" />
+        <StatCard icon={<E.RupeeCircle/>} label="Expenses" value={formatCurrency(data.monthlyExpenses)} subtext="This month" gradient="from-red-500 to-red-600" />
+        <StatCard icon={<E.Money/>} label="Cash Balance" value={formatCurrency(data.cashBalance)} gradient="from-green-500 to-green-600" />
+        <StatCard icon={<E.TrendUp/>} label="Profit" value={formatCurrency(data.profit)} subtext={`${data.growthPercent >= 0 ? "+" : ""}${data.growthPercent}%`} gradient={data.profit >= 0 ? "from-emerald-500 to-emerald-600" : "from-red-500 to-red-600"} />
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <MiniCard icon="📄" label="Total Invoices" value={data.totalInvoices} onClick={() => onNavigate("history")} />
-        <MiniCard icon="📋" label="Quotations" value={data.totalQuotations} onClick={() => onNavigate("history")} />
-        <MiniCard icon="👥" label="Customers" value={data.totalCustomers} onClick={() => onNavigate("customers")} />
-        <MiniCard icon="⏱️" label="Pending" value={data.pendingInvoices} color="text-orange-600" onClick={() => onNavigate("payments")} />
+        <MiniCard icon={<E.Doc/>} label="Total Invoices" value={data.totalInvoices} onClick={() => onNavigate("history")} />
+        <MiniCard icon={<E.Clipboard/>} label="Quotations" value={data.totalQuotations} onClick={() => onNavigate("history")} />
+        <MiniCard icon={<E.Users/>} label="Customers" value={data.totalCustomers} onClick={() => onNavigate("customers")} />
+        <MiniCard icon={<E.Stopwatch/>} label="Pending" value={data.pendingInvoices} color="text-orange-600" onClick={() => onNavigate("payments")} />
       </div>
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Revenue Chart */}
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-          <h3 className="font-bold text-gray-800 mb-4">📊 Monthly Revenue</h3>
+          <h3 className="font-bold text-gray-800 mb-4"><E.Chart/> Monthly Revenue</h3>
           <div className="h-48 flex items-end gap-2">
             {data.monthlyRevenue.length === 0 ? (
               <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">No data yet</div>
@@ -139,11 +140,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         {/* Credit Alerts */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-100 bg-red-50">
-            <h3 className="font-bold text-red-700">⚠️ Credit Alerts</h3>
+            <h3 className="font-bold text-red-700"><E.Warn/> Credit Alerts</h3>
           </div>
           <div className="divide-y divide-gray-50 max-h-60 overflow-auto">
             {data.creditAlerts.length === 0 ? (
-              <div className="p-6 text-center text-gray-400 text-sm">No alerts 👍</div>
+              <div className="p-6 text-center text-gray-400 text-sm">No alerts <E.ThumbUp/></div>
             ) : (
               data.creditAlerts.map((cust) => (
                 <div key={cust.id} className="px-4 py-3 hover:bg-red-50/50">
@@ -165,7 +166,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         {/* Recent Invoices */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-100 flex justify-between items-center">
-            <h3 className="font-bold text-gray-800">📄 Recent Invoices</h3>
+            <h3 className="font-bold text-gray-800"><E.Doc/> Recent Invoices</h3>
             <button onClick={() => onNavigate("history")} className="text-xs text-blue-600 hover:underline">View All →</button>
           </div>
           <div className="divide-y divide-gray-50">
@@ -175,8 +176,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               data.recentInvoices.map((inv) => (
                 <div key={inv.id} className="px-5 py-3 flex justify-between items-center hover:bg-gray-50 cursor-pointer" onClick={() => onNavigate("loadInvoice", { id: inv.id })}>
                   <div>
-                    <div className="font-semibold text-sm text-blue-700">{inv.invoiceNumber}</div>
-                    <div className="text-xs text-gray-400">{inv.customerName || "Walk-in"}</div>
+                    <div className="font-bold text-sm text-gray-800">{inv.customerName || "Walk-in"}</div>
+                    <div className="text-xs text-gray-500">{inv.invoiceNumber}</div>
                   </div>
                   <div className="text-right">
                     <div className="font-semibold text-sm">{formatCurrency(inv.grandTotal)}</div>
@@ -193,18 +194,18 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         {/* Pending Payments */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-100 flex justify-between items-center">
-            <h3 className="font-bold text-gray-800">⏳ Pending Payments</h3>
+            <h3 className="font-bold text-gray-800"><E.Hourglass/> Pending Payments</h3>
             <button onClick={() => onNavigate("payments")} className="text-xs text-blue-600 hover:underline">View All →</button>
           </div>
           <div className="divide-y divide-gray-50">
             {data.pendingPayments.length === 0 ? (
-              <div className="p-6 text-center text-gray-400 text-sm">All payments received! 🎉</div>
+              <div className="p-6 text-center text-gray-400 text-sm">All payments received! <E.Party/></div>
             ) : (
               data.pendingPayments.map((inv) => (
                 <div key={inv.id} className="px-5 py-3 flex justify-between items-center hover:bg-gray-50">
                   <div>
-                    <div className="font-semibold text-sm text-gray-800">{inv.invoiceNumber}</div>
-                    <div className="text-xs text-gray-400">{inv.customerName || "Walk-in"}</div>
+                    <div className="font-bold text-sm text-gray-800">{inv.customerName || "Walk-in"}</div>
+                    <div className="text-xs text-gray-500">{inv.invoiceNumber}</div>
                   </div>
                   <div className="text-right">
                     <div className="font-bold text-sm text-orange-600">{formatCurrency(inv.balanceAmount)}</div>
@@ -222,7 +223,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         {/* Top Customers */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-100">
-            <h3 className="font-bold text-gray-800">👑 Top Customers</h3>
+            <h3 className="font-bold text-gray-800"><E.Crown/> Top Customers</h3>
           </div>
           <div className="divide-y divide-gray-50">
             {data.topCustomers.length === 0 ? (
@@ -230,7 +231,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             ) : (
               data.topCustomers.map((cust, i) => (
                 <div key={cust.id} className="px-5 py-3 flex items-center gap-3 hover:bg-gray-50">
-                  <span className="text-lg">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "👤"}</span>
+                  <span className="text-lg inline-flex items-center">{i === 0 ? <E.Medal1/> : i === 1 ? <E.Medal2/> : i === 2 ? <E.Medal3/> : <E.User/>}</span>
                   <div className="flex-1">
                     <div className="font-medium text-sm">{cust.name}</div>
                     <div className="text-xs text-gray-400">Business: {formatCurrency(cust.totalBusiness || 0)}</div>
@@ -246,14 +247,14 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
         {/* Quick Actions */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-          <h3 className="font-bold text-gray-800 mb-4">⚡ Quick Actions</h3>
+          <h3 className="font-bold text-gray-800 mb-4"><E.Bolt/> Quick Actions</h3>
           <div className="grid grid-cols-3 gap-3">
-            <QuickAction icon="📄" label="Invoice" onClick={() => onNavigate("invoice")} color="blue" />
-            <QuickAction icon="📋" label="Quotation" onClick={() => onNavigate("quotation")} color="purple" />
-            <QuickAction icon="🧮" label="Calculate" onClick={() => onNavigate("calculate")} color="green" />
-            <QuickAction icon="💰" label="Payment" onClick={() => onNavigate("payments")} color="emerald" />
-            <QuickAction icon="💸" label="Expense" onClick={() => onNavigate("expenses")} color="red" />
-            <QuickAction icon="📊" label="Reports" onClick={() => onNavigate("reports")} color="indigo" />
+            <QuickAction icon={<E.Doc/>} label="Invoice" onClick={() => onNavigate("invoice")} color="blue" />
+            <QuickAction icon={<E.Clipboard/>} label="Quotation" onClick={() => onNavigate("quotation")} color="purple" />
+            <QuickAction icon={<E.Calc/>} label="Calculate" onClick={() => onNavigate("calculate")} color="green" />
+            <QuickAction icon={<E.Money/>} label="Payment" onClick={() => onNavigate("payments")} color="emerald" />
+            <QuickAction icon={<E.RupeeCircle/>} label="Expense" onClick={() => onNavigate("expenses")} color="red" />
+            <QuickAction icon={<E.Chart/>} label="Reports" onClick={() => onNavigate("reports")} color="indigo" />
           </div>
         </div>
       </div>
@@ -261,10 +262,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   );
 }
 
-function StatCard({ icon, label, value, subtext, gradient }: { icon: string; label: string; value: string; subtext?: string; gradient: string }) {
+function StatCard({ icon, label, value, subtext, gradient }: { icon: ReactNode; label: string; value: string; subtext?: string; gradient: string }) {
   return (
     <div className={`bg-gradient-to-br ${gradient} rounded-2xl p-4 text-white shadow-sm`}>
-      <div className="text-2xl mb-1">{icon}</div>
+      <div className="text-2xl mb-1 inline-flex">{icon}</div>
       <div className="text-lg sm:text-xl font-bold truncate">{value}</div>
       <div className="text-[11px] text-white/80">{label}</div>
       {subtext && <div className="text-[10px] text-white/60 mt-0.5">{subtext}</div>}
@@ -272,10 +273,10 @@ function StatCard({ icon, label, value, subtext, gradient }: { icon: string; lab
   );
 }
 
-function MiniCard({ icon, label, value, color, onClick }: { icon: string; label: string; value: number; color?: string; onClick?: () => void }) {
+function MiniCard({ icon, label, value, color, onClick }: { icon: ReactNode; label: string; value: number; color?: string; onClick?: () => void }) {
   return (
     <div onClick={onClick} className="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition-all">
-      <span className="text-xl">{icon}</span>
+      <span className="text-xl inline-flex">{icon}</span>
       <div>
         <div className={`text-lg font-bold ${color || "text-gray-800"}`}>{value}</div>
         <div className="text-[10px] text-gray-400 uppercase">{label}</div>
@@ -284,7 +285,7 @@ function MiniCard({ icon, label, value, color, onClick }: { icon: string; label:
   );
 }
 
-function QuickAction({ icon, label, onClick, color }: { icon: string; label: string; onClick: () => void; color: string }) {
+function QuickAction({ icon, label, onClick, color }: { icon: ReactNode; label: string; onClick: () => void; color: string }) {
   const bgClasses: Record<string, string> = {
     blue: "bg-blue-50 hover:bg-blue-100 text-blue-700",
     purple: "bg-purple-50 hover:bg-purple-100 text-purple-700",
@@ -295,7 +296,7 @@ function QuickAction({ icon, label, onClick, color }: { icon: string; label: str
   };
   return (
     <button onClick={onClick} className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all ${bgClasses[color]}`}>
-      <span className="text-xl">{icon}</span>
+      <span className="text-xl inline-flex">{icon}</span>
       <span className="text-xs font-medium">{label}</span>
     </button>
   );
